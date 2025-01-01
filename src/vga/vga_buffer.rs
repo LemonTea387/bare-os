@@ -1,10 +1,24 @@
 use core::fmt;
 
+use lazy_static::lazy_static;
+use spin::Mutex;
+
 use volatile::Volatile;
 
 const BUFFER_HEIGHT: usize = 25;
 const BUFFER_WIDTH: usize = 80;
 const VGA_TEXT_BUFFER_MEM: usize = 0xb8000;
+
+lazy_static! {
+    pub static ref VGA_Writer: Mutex<ScreenWriter> = Mutex::new(ScreenWriter::default());
+}
+
+// This is a private implementation so we can hide it
+#[doc(hidden)]
+pub fn _print(args: fmt::Arguments) {
+    use core::fmt::Write;
+    VGA_Writer.lock().write_fmt(args).unwrap();
+}
 
 #[allow(dead_code)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

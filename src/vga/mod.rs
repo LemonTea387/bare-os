@@ -1,9 +1,12 @@
-use lazy_static::lazy_static;
-use spin::Mutex;
-use vga_buffer::ScreenWriter;
+pub mod vga_buffer;
 
-mod vga_buffer;
+#[macro_export]
+macro_rules! print {
+    ($($arg:tt)*) => ($crate::vga::vga_buffer::_print(format_args!($($arg)*)));
+}
 
-lazy_static! {
-    pub static ref VGA_Writer: Mutex<ScreenWriter> = Mutex::new(ScreenWriter::default());
+#[macro_export]
+macro_rules! println {
+    () => ($crate::print!("\n"));
+    ($($arg:tt)*) => ($crate::print!("{}\n", format_args!($($arg)*)));
 }
