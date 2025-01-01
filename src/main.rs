@@ -8,6 +8,7 @@ mod vga;
 /// Function to call on panic
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> ! {
+    println!("{}", _info);
     loop {}
 }
 
