@@ -9,6 +9,7 @@
 
 use core::panic::PanicInfo;
 
+mod serial;
 mod vga;
 
 /// Function to call on panic
