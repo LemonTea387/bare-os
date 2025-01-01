@@ -6,10 +6,25 @@ edition = "2021"
 [dependencies]
 bootloader = "0.9"
 spin = "0.9.8"
+uart_16550 = "0.2.0"
 volatile = "0.2.6"
+x86_64 = "0.15.2"
 
 [dependencies.lazy_static]
 version = "1.0"
 features = ["spin_no_std"]
+
+# Used for testing with QEMU, isa-debug-exit is a special device to exit qemu from guest system
+# bootimage runner appends `test-args` to QEMU command for all test executables.
+# Also specify I/O port which device can be reached from our kernel.
+# Since isa-debug-exit uses port-mapped I/O instead of mem-mapped I/O
+# 0xf4 is simply an unused x86's IO bus, and iosize is port size.
 [package.metadata.bootimage]
+test-args = [
+	"-device",
+	"isa-debug-exit,iobase=0xf4,iosize=0x04",
+	# Redirect serial to stdio
+	"-serial",
+	"stdio",
+]
 test-success-exit-code = 33 # (0x10 << 1) | 1
