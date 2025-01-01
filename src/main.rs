@@ -53,3 +53,9 @@ pub fn test_runner(tests: &[&dyn Fn()]) {
     exit_qemu(QemuExitCode::Success);
 }
 
+#[test_case]
+fn test_trivial() {
+    serial_println!("Asserting...");
+    assert_eq!(1, 1);
+    serial_println!("OKです");
+}
