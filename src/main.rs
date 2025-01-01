@@ -2,31 +2,21 @@
 #![no_main]
 // Replace default test framework
 #![feature(custom_test_frameworks)]
-#![test_runner(crate::test_runner)]
+#![test_runner(crate::test::test_runner)]
 // The custom test framework generates `main` that calls `test_runner`, but we are no_main
 // We gotta change the name of generated function
 #![reexport_test_harness_main = "test_main"]
 
-use core::panic::PanicInfo;
-
 mod serial;
+#[cfg(test)]
+mod test;
 mod vga;
 
 /// Function to call on panic
 #[cfg(not(test))]
 #[panic_handler]
-fn panic(info: &PanicInfo) -> ! {
+fn panic(info: &core::panic::PanicInfo) -> ! {
     println!("{}", info);
-    loop {}
-}
-
-// our panic handler in test mode
-#[cfg(test)]
-#[panic_handler]
-fn panic(info: &PanicInfo) -> ! {
-    serial_println!("[failed]\n");
-    serial_println!("Error: {}\n", info);
-    exit_qemu(QemuExitCode::Failed);
     loop {}
 }
 
@@ -38,35 +28,4 @@ pub extern "C" fn _start() -> ! {
     test_main();
 
     loop {}
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-#[repr(u32)]
-pub enum QemuExitCode {
-    Success = 0x10,
-    Failed = 0x11,
-}
-pub fn exit_qemu(exit_code: QemuExitCode) {
-    use x86_64::instructions::port::Port;
-
-    unsafe {
-        let mut port = Port::new(0xf4);
-        port.write(exit_code as u32)
-    }
-}
-
-#[cfg(test)]
-pub fn test_runner(tests: &[&dyn Fn()]) {
-    println!("Running {} tests", tests.len());
-    for test in tests {
-        test();
-    }
-    exit_qemu(QemuExitCode::Success);
-}
-
-#[test_case]
-fn test_trivial() {
-    serial_println!("Asserting...");
-    assert_eq!(1, 1);
-    serial_println!("OKです");
 }
