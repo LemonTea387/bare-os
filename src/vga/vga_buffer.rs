@@ -10,14 +10,14 @@ const BUFFER_WIDTH: usize = 80;
 const VGA_TEXT_BUFFER_MEM: usize = 0xb8000;
 
 lazy_static! {
-    pub static ref VGA_Writer: Mutex<ScreenWriter> = Mutex::new(ScreenWriter::default());
+    pub static ref VGAWriter: Mutex<ScreenWriter> = Mutex::new(ScreenWriter::default());
 }
 
 // This is a private implementation so we can hide it
 #[doc(hidden)]
 pub fn _print(args: fmt::Arguments) {
     use core::fmt::Write;
-    VGA_Writer.lock().write_fmt(args).unwrap();
+    VGAWriter.lock().write_fmt(args).unwrap();
 }
 
 #[allow(dead_code)]
