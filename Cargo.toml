@@ -14,17 +14,22 @@ x86_64 = "0.15.2"
 version = "1.0"
 features = ["spin_no_std"]
 
+## https://github.com/rust-osdev/bootimage/blob/master/Readme.md#configuration
+[package.metadata.bootimage]
 # Used for testing with QEMU, isa-debug-exit is a special device to exit qemu from guest system
 # bootimage runner appends `test-args` to QEMU command for all test executables.
 # Also specify I/O port which device can be reached from our kernel.
 # Since isa-debug-exit uses port-mapped I/O instead of mem-mapped I/O
 # 0xf4 is simply an unused x86's IO bus, and iosize is port size.
-[package.metadata.bootimage]
 test-args = [
 	"-device",
 	"isa-debug-exit,iobase=0xf4,iosize=0x04",
 	# Redirect serial to stdio
 	"-serial",
 	"stdio",
+	# Test doesn't need display
+	"-display",
+	"none",
 ]
 test-success-exit-code = 33 # (0x10 << 1) | 1
+test-timeout = 300
